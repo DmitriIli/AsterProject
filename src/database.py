@@ -1,43 +1,28 @@
 from typing import AsyncGenerator
 
-from fastapi import Depends
 from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeMeta, declarative_base, DeclarativeBase
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy.orm import DeclarativeMeta, DeclarativeBase, Session, sessionmaker
+from sqlalchemy import URL, create_engine, text
+import asyncio
+from config import settings
 
-from src.config import *
+sync_engine = create_engine(
+    url=settings.DATABASE_URL_psycopg,
+    echo=True,
+    pool_size=5,
+    max_overflow=10
+)
 
-DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
-Base: DeclarativeMeta = declarative_base()
+async_engine = create_async_engine(
+    url=settings.DATABASE_URL_asyncpg,
+    echo=True,
+)
+
+session_factory = sessionmaker(sync_engine)
+
+async_session_factory = async_sessionmaker(async_engine)
 
 
 class Base(DeclarativeBase):
-    pass
-
-
-class User(SQLAlchemyBaseUserTable[int], Base):
-    email: str = Column(String(length=320), unique=True,
-                        index=True, nullable=False)
-    hashed_password: str = Column(String(length=1024), nullable=False)
-    is_active: bool = Column(Boolean, default=True, nullable=False)
-    is_superuser: bool = Column(Boolean, default=False, nullable=False)
-    is_verified: bool = Column(Boolean, default=False, nullable=False)
-
-
-engine = create_async_engine(DATABASE_URL)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-
-
-async def create_db_and_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session_maker() as session:
-        yield session
-
-
-async def get_user_db(session: AsyncSession = Depends(get_async_session)):
-    yield SQLAlchemyUserDatabase(session, User)
+    ...
