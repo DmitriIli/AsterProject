@@ -4,14 +4,20 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import text, insert
 
 
-async def async_create_all():
-    await metadata.create_all(async_engine)
+# async def async_create_all():
+#     await metadata.create_all(async_engine)
 
 
 def sync_create_all():
     sync_engine.echo = False
-    metadata.create_all(sync_engine)
+    # metadata.create_all(sync_engine)
     Base.metadata.create_all(sync_engine)
+
+
+async def async_get_all():
+    async with async_engine.connect() as conn:
+        res = await conn.execute(text('select version()'))
+        print(f'{res.first()}')
 
 
 def drop_table(table_name):

@@ -32,5 +32,6 @@ class Settings(BaseSettings):
         return f'postgresql+psycopg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
     # model_config = SettingsConfigDict(env_file='.env')
+    
 
 settings = Settings()
