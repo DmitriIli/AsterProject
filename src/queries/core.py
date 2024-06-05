@@ -10,7 +10,7 @@ from sqlalchemy import text, insert
 
 def sync_create_all():
     sync_engine.echo = False
-    # metadata.create_all(sync_engine)
+    metadata.create_all(sync_engine)
     Base.metadata.create_all(sync_engine)
 
 
