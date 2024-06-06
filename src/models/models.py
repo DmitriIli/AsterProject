@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, TIMESTAMP, JSON, DateTime, Numeric, CheckConstraint
-from sqlalchemy.orm import mapped_column, Mapped, DeclarativeBase, DeclarativeMeta
+from sqlalchemy.orm import mapped_column, Mapped, DeclarativeBase, DeclarativeMeta, registry
+from sqlalchemy.ext.declarative import declarative_base
 from typing import List
 from datetime import datetime
 
@@ -8,8 +9,10 @@ from datetime import datetime
 metadata = MetaData()
 
 
-class Base(DeclarativeBase):
-    ...
+# class Base(DeclarativeBase):...
+
+Base = declarative_base()
+mapper_registry = registry()
 
 
 customers = Table('customers', metadata,
@@ -18,7 +21,7 @@ customers = Table('customers', metadata,
                   Column('last_name', String()),
                   Column('user_name', String(), unique=True),
                   Column('email', String(), unique=True),
-                  Column('address', String()),
+                  Column('address', String()), 
                   Column('town', String()),
                   Column('create_on', DateTime(), default=datetime.now),
                   Column('update_on', DateTime(),
@@ -49,6 +52,12 @@ order_lines = Table('order_lines', metadata,
                     Column('item_id', ForeignKey('items.id')),
                     Column('quantity', Integer())
                     )
+
+class Customers:
+    ...
+
+mapper_registry.map_imperatively(Customers, customers)
+
 
 
 class Users(Base):

@@ -1,7 +1,7 @@
 from database import async_engine, sync_engine, session_factory, async_session_factory
 from models.models import metadata, roles, Base
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import text, insert
+from sqlalchemy import text, insert, schema
 
 
 # async def async_create_all():
@@ -49,3 +49,10 @@ def insert_data():
 def get_tables_list():
     for t in metadata.tables:
         print(t)
+
+
+def get_metadata():
+    print('----------------\n')
+    for t in metadata.tables:
+        print(t)
+    print('----------------\n')
